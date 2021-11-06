@@ -136,7 +136,6 @@ Magazine::Magazine(const char *title, int issue, int year, int quantity):Documen
 
 Magazine::~Magazine(){
 	delete [] _title;
-	// free(_issue);
 }
 
 /* Magazine, title: <title>, issue: <issue>, year: <year>, quantity: <quantity> */
