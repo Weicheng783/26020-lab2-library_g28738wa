@@ -37,8 +37,8 @@ int Document::getQuantity(){
 /* Used when someone tries to borrow a document, should return 0 on success
  * and something else on failure */
 int Document::borrowDoc(){
-	if(_quantity > 0){
-		_quantity --;
+	if(getQuantity() > 0){
+		updateQuantity(getQuantity()-1);
 		return 0;
 	}else{
 		return -1;
@@ -47,7 +47,7 @@ int Document::borrowDoc(){
 
 /* Used when someone returns a document */
 void Document::returnDoc(){
-	_quantity ++;
+	updateQuantity(getQuantity()+1);
 }
 
 
@@ -71,7 +71,7 @@ document_type Novel::getDocType(){
 
 /* Novel, title: <title>, author: <author>, year: <year>, quantity: <quantity> */
 void Novel::print(){
-	printf("Novel, title: %s, author: %s, year: %d, quantity: %d", _title, _author, _year, _quantity);
+	printf("Novel, title: %s, author: %s, year: %d, quantity: %d\n", _title, _author, _year, _quantity);
 }
 
 /* getters and setters */
@@ -105,7 +105,7 @@ document_type Comic::getDocType(){
 
 /* Comic, title: <title>, author: <author>, issue: <issue>, year: <year>, quantity: <quantity> */
 void Comic::print(){
-	printf("Comic, title: %s, author: %s, issue: %d, year: %d, quantity: %d", _title, _author, _issue, _year, _quantity);
+	printf("Comic, title: %s, author: %s, issue: %d, year: %d, quantity: %d\n", _title, _author, _issue, _year, _quantity);
 }
 
 /* getters, setters */
@@ -141,7 +141,7 @@ Magazine::~Magazine(){
 
 /* Magazine, title: <title>, issue: <issue>, year: <year>, quantity: <quantity> */
 void Magazine::print(){
-	printf("Magazine, title: %s, issue: %d, year: %d, quantity: %d", _title, _issue, _year, _quantity);
+	printf("Magazine, title: %s, issue: %d, year: %d, quantity: %d\n", _title, _issue, _year, _quantity);
 }
 
 document_type Magazine::getDocType(){
@@ -176,8 +176,55 @@ void Library::print(){
  * Here you should use low-level file I/Os (open, write, etc.) as seen
  * in the course. */
 int Library::dumpCSV(const char *filename){
-	ofstream fout("library.csv");
-	fout << "write here";
+	// ofstream fout(filename);
+	ofstream fout;
+	fout.open(filename);
+	
+
+	for(int i=0; i<_docs.size(); i++){
+		if(_docs[i]->getDocType() == DOC_NOVEL){
+			Novel *pb=dynamic_cast<Novel*>(_docs[i]);
+
+			fout << "novel,";
+			fout << pb->getTitle();
+			fout << ",";
+			fout << pb->getAuthor();
+			fout << ",,";
+			fout << pb->getYear();
+			fout << ",";
+			fout << pb->getQuantity();
+		}else if(_docs[i]->getDocType() == DOC_MAGAZINE){
+			Magazine *pb=dynamic_cast<Magazine*>(_docs[i]);
+			
+			fout << "magazine,";
+			fout << pb->getTitle();
+			fout << ",,";
+			fout << pb->getIssue();
+			fout << ",";
+			fout << pb->getYear();
+			fout << ",";
+			fout << pb->getQuantity();
+		}else if(_docs[i]->getDocType() == DOC_COMIC){
+			Comic *pb=dynamic_cast<Comic*>(_docs[i]);
+			
+			fout << "comic,";
+			fout << pb->getTitle();
+			fout << ",";
+			fout << pb->getAuthor();
+			fout << ",";
+			fout << pb->getIssue();
+			fout << ",";
+			fout << pb->getYear();
+			fout << ",";
+			fout << pb->getQuantity();			
+		}
+		
+
+		fout << "\n";
+	}
+
+	fout.close();
+	return 0;
 }
 
 /* search for a document in the library, based on the title. We assume that
@@ -187,7 +234,7 @@ int Library::dumpCSV(const char *filename){
 
 Document *Library::searchDocument(const char *title){
 	for(int i=0; i<_docs.size(); i++){
-		if(_docs[i]->getTitle() == title){
+		if(strcmp(_docs[i]->getTitle(),title) == 0){
 			return _docs[i];
 		}
 	}
@@ -202,8 +249,13 @@ int Library::addDocument(Document *d){
 }
 int Library::delDocument(const char *title){
 	if(searchDocument(title) != NULL){
-		// _docs.erase(searchDocument(title));
-		return 0;
+		for(int i=0; i<_docs.size(); i++){
+			if(strcmp(_docs[i]->getTitle(),title) == 0){
+				_docs.erase(_docs.begin() + i);
+				return 0;
+			}
+		}
+		return -1;
 	}else{
 		return -1;
 	}
@@ -243,9 +295,3 @@ int Library::returnDoc(const char *title){
 		return 0;
 	}
 }
-
-int main(int argc, char **argv){
-	return 0;
-}
-/* Holds all documents in the library */
-// vector<Document *> _docs;
