@@ -1,4 +1,3 @@
-/* complete this file */
 #include <stdio.h>
 #include "library.h"
 #include <string.h>
@@ -6,9 +5,7 @@
 #include <iomanip>
 #include <fstream>
 
-/* Parent class instantiation for all types of documents */
-
-/* setters and getters implementation*/
+/* Document setters and getters implementation */
 void Document::updateTitle(const char *newTitle){
 	_title = new char[strlen(newTitle)+1];
 	strcpy(_title,newTitle);
@@ -63,6 +60,7 @@ Novel::Novel(const char *title, const char *author, int year, int quantity):Docu
 
 Novel::~Novel(){
 	delete [] _title;
+	delete [] _author;
 }
 
 document_type Novel::getDocType(){
@@ -74,7 +72,7 @@ void Novel::print(){
 	printf("Novel, title: %s, author: %s, year: %d, quantity: %d\n", _title, _author, _year, _quantity);
 }
 
-/* getters and setters */
+/* Getters and setters */
 void Novel::updateAuthor(const char *newAuthor){
 	_author = new char[strlen(newAuthor)+1];
 	strcpy(_author,newAuthor);
@@ -97,6 +95,7 @@ Comic::Comic(const char *title, const char *author, int issue, int year, int qua
 
 Comic::~Comic(){
 	delete [] _title;
+	delete [] _author;
 }
 
 document_type Comic::getDocType(){
@@ -108,7 +107,7 @@ void Comic::print(){
 	printf("Comic, title: %s, author: %s, issue: %d, year: %d, quantity: %d\n", _title, _author, _issue, _year, _quantity);
 }
 
-/* getters, setters */
+/* Getters, setters */
 void Comic::updateAuthor(const char *newAuthor){
 	_author = new char[strlen(newAuthor)+1];
 	strcpy(_author,newAuthor);	
@@ -147,7 +146,7 @@ document_type Magazine::getDocType(){
 	return DOC_MAGAZINE;
 }
 
-/* getters, setters */
+/* Getters, setters */
 void Magazine::updateIssue(int newIssue){
 	_issue = newIssue;
 }
@@ -158,7 +157,7 @@ int Magazine::getIssue(){
 /* One instance of that class represents a library */
 Library::Library(){}
 
-/* print the entire library on the standard output, one line per document,
+/* Print the entire library on the standard output, one line per document,
  * in the order they were inserted in the library, using the print()
  * methods implemented by the document objects */
 void Library::print(){
@@ -179,7 +178,6 @@ int Library::dumpCSV(const char *filename){
 	ofstream fout;
 	fout.open(filename);
 	
-
 	for(int i=0; i<_docs.size(); i++){
 		if(_docs[i]->getDocType() == DOC_NOVEL){
 			Novel *pb=dynamic_cast<Novel*>(_docs[i]);
@@ -226,7 +224,7 @@ int Library::dumpCSV(const char *filename){
 	return 0;
 }
 
-/* search for a document in the library, based on the title. We assume that
+/* Search for a document in the library, based on the title. We assume that
 * a title identify uniquely a document in the library, i.e. there cannote
 * be 2 documents with the same title Returns a pointer to the document if
 * found, NULL otherwise */
@@ -240,12 +238,13 @@ Document *Library::searchDocument(const char *title){
 	return NULL;
 }
 
-/* Add/delete a document to/from the library, return 0 on success and
+/* Add or delete a document to/from the library, return 0 on success and
  * something else on failure.  */
 int Library::addDocument(Document *d){
 	_docs.push_back(d);
 	return 0;
 }
+
 int Library::delDocument(const char *title){
 	if(searchDocument(title) != NULL){
 		for(int i=0; i<_docs.size(); i++){
@@ -271,7 +270,7 @@ int Library::countDocumentOfType(document_type t){
 	return count;
 }
 
-/* Borrow/return documents, return 0 on success, something else on
+/* Borrow or return documents, return 0 on success, something else on
  * failure */
 int Library::borrowDoc(const char *title){
 	if(searchDocument(title) == NULL || searchDocument(title)->getQuantity() == 0){
